@@ -1,118 +1,83 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import React, { useEffect, useState } from 'react';
+import { Alert, ImageBackground, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+const image = { uri: 'https://cdn.pixabay.com/photo/2023/10/22/18/55/sky-8334619_1280.jpg' };
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+const API_KEY = '8cc108952fba4f358c672312242405';
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+const App = () => {
 
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
+  const [value, setValue] = useState('')
+  const [data, setData] = useState(null)
+  const [inCelsius, setInCelsius] = useState(true)
 
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+  const getWeatherFromApi = async () => {
+    try {
+      const response = await fetch(`https://api.weatherapi.com/v1/current.json?q=${value}&key=${API_KEY}`);
+      const json = await response.json();
+      console.log("setCityData", json);
+      setData(json);
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Error fetching city data");
+    }
   };
 
-  return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
-}
+  useEffect(() => {
 
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
+  }, []);
+
+  return (
+    <View style={{ flex: 1 }}>
+      <ImageBackground
+        source={image}
+        resizeMode="cover"
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+        }}
+      >
+        <View style={{ backgroundColor: 'white', padding: 20, marginHorizontal: 20, borderRadius: 10 }}>
+
+          <Text style={{ marginBottom: 10, textAlign: 'center', fontWeight: 'bold', fontSize: 20 }}>Weather</Text>
+
+          <View style={{ flexDirection: 'row', marginBottom: 10 }}>
+            <TextInput
+              style={{ height: 40, flex: 1, borderWidth: 1, paddingStart: 10, borderRadius: 10 }} value={value} onChangeText={setValue} />
+
+            <TouchableOpacity style={{ borderWidth: 1, padding: 10, borderRadius: 10 }} onPress={getWeatherFromApi}>
+              <Text>Search</Text>
+            </TouchableOpacity>
+          </View>
+
+          {data?.location?.name &&
+            <>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly' }}>
+
+                <Text style={{ marginEnd: 10, fontSize: 16, }}>{data?.location?.name} Temperature: {inCelsius ? data?.current?.temp_c : data?.current?.temp_f}°{inCelsius ? 'C' : 'F'}</Text>
+
+                <TouchableOpacity onPress={() => setInCelsius(!inCelsius)} style={{
+                  borderWidth: 1,
+                  borderColor: "gray",
+                  padding: 5,
+                  borderRadius: 20,
+                }}>
+                  <Text style={{ fontSize: 16 }}>{inCelsius ? 'C' : 'F'}</Text>
+                </TouchableOpacity>
+              </View>
+
+              <Text style={{
+                fontSize: 16,
+              }}>
+                {data.location.name} Weather Conditions: {data.current.condition.text}
+              </Text>
+            </>
+          }
+        </View>
+
+      </ImageBackground>
+    </View>
+  )
+};
 
 export default App;
