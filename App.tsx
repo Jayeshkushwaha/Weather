@@ -3,7 +3,7 @@ import { Alert, ImageBackground, PermissionsAndroid, Text, TextInput, TouchableO
 import Geolocation from 'react-native-geolocation-service';
 
 const image = { uri: 'https://cdn.pixabay.com/photo/2023/10/22/18/55/sky-8334619_1280.jpg' };
-const API_KEY = '8cc108952fba4f358c672312242405J';
+const API_KEY = '8cc108952fba4f358c672312242405';
 
 const App = () => {
   const [value, setValue] = useState('');
